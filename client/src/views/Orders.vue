@@ -75,6 +75,8 @@
         </div>
       </div>
 
+      <div class="card error" v-if="submittedError">{{ submittedError }}</div>
+
       <div class="card" v-if="submittedOrders.length">
         <div class="card-header">
           <h3 class="card-title">{{ t('orders.submittedOrders') }} ({{ submittedOrders.length }})</h3>
@@ -128,6 +130,7 @@ export default {
     const error = ref(null)
     const orders = ref([])
     const submittedOrders = ref([])
+    const submittedError = ref(null)
 
     // Use shared filters
     const {
@@ -162,7 +165,7 @@ export default {
       try {
         submittedOrders.value = await api.getRestockOrders()
       } catch (err) {
-        error.value = 'Failed to load submitted orders: ' + err.message
+        submittedError.value = 'Failed to load submitted orders: ' + err.message
       }
     }
 
@@ -206,6 +209,7 @@ export default {
       error,
       orders,
       submittedOrders,
+      submittedError,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,
