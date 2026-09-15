@@ -1,10 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
+from datetime import datetime, timedelta
 from pydantic import BaseModel
 from mock_data import inventory_items, orders, demand_forecasts, backlog_items, spending_summary, monthly_spending, category_spending, recent_transactions, purchase_orders
 
 app = FastAPI(title="Factory Inventory Management System")
+
+# Submitted restocking orders, in-memory like the rest of the mock data
+restock_orders = []
+
+RESTOCK_LEAD_TIME_DAYS = 14
 
 # Quarter mapping for date filtering
 QUARTER_MAP = {
@@ -120,6 +126,28 @@ class CreatePurchaseOrderRequest(BaseModel):
     expected_delivery_date: str
     notes: Optional[str] = None
 
+class RestockOrderLine(BaseModel):
+    sku: str
+    name: str
+    quantity: int
+    unit_cost: float
+    line_total: float
+
+class CreateRestockOrderRequest(BaseModel):
+    budget: float
+    items: List[RestockOrderLine]
+
+class RestockOrder(BaseModel):
+    id: str
+    order_number: str
+    budget: float
+    items: List[RestockOrderLine]
+    total_cost: float
+    submitted_date: str
+    expected_delivery: str
+    lead_time_days: int
+    status: str
+
 # API endpoints
 @app.get("/")
 def root():
@@ -178,6 +206,31 @@ def get_backlog():
         item_dict["has_purchase_order"] = has_po
         result.append(item_dict)
     return result
+
+@app.get("/api/restock-orders", response_model=List[RestockOrder])
+def get_restock_orders():
+    """Get submitted restocking orders"""
+    return restock_orders
+
+@app.post("/api/restock-orders", response_model=RestockOrder)
+def create_restock_order(request: CreateRestockOrderRequest):
+    """Submit a restocking order built from the demand forecast"""
+    submitted = datetime.now()
+    delivery = submitted + timedelta(days=RESTOCK_LEAD_TIME_DAYS)
+
+    order = {
+        "id": str(len(restock_orders) + 1),
+        "order_number": f"RST-{submitted.year}-{len(restock_orders) + 1:04d}",
+        "budget": request.budget,
+        "items": [item.model_dump() for item in request.items],
+        "total_cost": round(sum(item.line_total for item in request.items), 2),
+        "submitted_date": submitted.isoformat(timespec="seconds"),
+        "expected_delivery": delivery.isoformat(timespec="seconds"),
+        "lead_time_days": RESTOCK_LEAD_TIME_DAYS,
+        "status": "Submitted"
+    }
+    restock_orders.append(order)
+    return order
 
 @app.get("/api/dashboard/summary")
 def get_dashboard_summary(

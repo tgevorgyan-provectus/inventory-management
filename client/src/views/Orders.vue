@@ -74,6 +74,38 @@
           </table>
         </div>
       </div>
+
+      <div class="card" v-if="submittedOrders.length">
+        <div class="card-header">
+          <h3 class="card-title">{{ t('orders.submittedOrders') }} ({{ submittedOrders.length }})</h3>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ t('orders.table.orderNumber') }}</th>
+                <th>{{ t('orders.table.items') }}</th>
+                <th>{{ t('orders.table.orderDate') }}</th>
+                <th>{{ t('orders.table.expectedDelivery') }}</th>
+                <th>{{ t('orders.table.leadTime') }}</th>
+                <th>{{ t('orders.table.totalValue') }}</th>
+                <th>{{ t('orders.table.status') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in submittedOrders" :key="order.id">
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>{{ t('orders.itemsCount', { count: order.items.length }) }}</td>
+                <td>{{ formatDate(order.submitted_date) }}</td>
+                <td>{{ formatDate(order.expected_delivery) }}</td>
+                <td>{{ t('orders.leadTimeDays', { days: order.lead_time_days }) }}</td>
+                <td><strong>{{ currencySymbol }}{{ order.total_cost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</strong></td>
+                <td><span class="badge info">{{ order.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -95,6 +127,7 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const orders = ref([])
+    const submittedOrders = ref([])
 
     // Use shared filters
     const {
@@ -121,6 +154,15 @@ export default {
         error.value = 'Failed to load orders: ' + err.message
       } finally {
         loading.value = false
+      }
+    }
+
+    // Submitted restock orders have no warehouse/category/month dimension, load separately
+    const loadSubmittedOrders = async () => {
+      try {
+        submittedOrders.value = await api.getRestockOrders()
+      } catch (err) {
+        error.value = 'Failed to load submitted orders: ' + err.message
       }
     }
 
@@ -153,13 +195,17 @@ export default {
       })
     }
 
-    onMounted(loadOrders)
+    onMounted(() => {
+      loadOrders()
+      loadSubmittedOrders()
+    })
 
     return {
       t,
       loading,
       error,
       orders,
+      submittedOrders,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,

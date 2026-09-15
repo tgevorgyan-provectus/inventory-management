@@ -45,6 +45,15 @@
         </svg>
         {{ t('nav.demandForecast') }}
       </router-link>
+      <router-link to="/restocking" :class="{ active: $route.path === '/restocking' }">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 8l-9-5-9 5 9 5 9-5z" />
+          <path d="M3 8v8l9 5 9-5V8" />
+          <path d="M12 13v4" />
+          <path d="M9.5 15.5L12 13l2.5 2.5" />
+        </svg>
+        {{ t('nav.restocking') }}
+      </router-link>
       <router-link to="/reports" :class="{ active: $route.path === '/reports' }">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
