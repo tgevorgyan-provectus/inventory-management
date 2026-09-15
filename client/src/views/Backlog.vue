@@ -138,7 +138,7 @@ export default {
     }
 
     const translatePriority = (priority) => {
-      return t('priority.' + String(priority).toLowerCase()) || priority
+      return t('priority.' + String(priority).toLowerCase())
     }
 
     // Watch for filter changes and reload data
