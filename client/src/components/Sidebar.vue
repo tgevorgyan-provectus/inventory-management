@@ -60,7 +60,7 @@
           <path d="M14 3v6h6" />
           <path d="M9 13h6M9 17h6" />
         </svg>
-        Reports
+        {{ t('nav.reports') }}
       </router-link>
     </nav>
 
