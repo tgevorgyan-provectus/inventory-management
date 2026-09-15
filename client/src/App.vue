@@ -137,22 +137,19 @@ export default {
 }
 
 :root {
-  --color-heading: #0f172a;
   --color-body: #1e293b;
-  --color-muted: #64748b;
   --color-border: #e2e8f0;
   --color-border-hover: #cbd5e1;
   --color-surface: #ffffff;
   --color-page-bg: #f8fafc;
-  --color-primary: #2563eb;
   --radius: 12px;
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
+  background: var(--color-page-bg);
+  color: var(--color-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -197,16 +194,16 @@ body {
 }
 
 .stat-card {
-  background: white;
+  background: var(--color-surface);
   padding: 1.5rem;
   border-radius: var(--radius);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
   transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  border-color: #cbd5e1;
+  border-color: var(--color-border-hover);
 }
 
 .stat-label {
@@ -242,10 +239,10 @@ body {
 }
 
 .card {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius);
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
   margin-bottom: 1.25rem;
 }
